@@ -1,0 +1,44 @@
+source ~/.vimrc
+let $generate='cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/gcc-6 -DCMAKE_CXX_COMPILER=/usr/bin/g++-6 -S /home/zero/cxx/script -B /home/zero/cxx/script-linux'
+let $clear="rm -r /home/zero/cxx/script-linux"
+set makeprg=cmake\ --build\ /home/zero/cxx/script-linux\ -j16
+set errorformat=%E%f:%l:%c:\ %trror:\ %m,%-C,%-Z%p^
+set errorformat+=%D%*\\a:\ Entering\ directory\ [`']%f'
+set errorformat+=%X%*\\a:\ Leaving\ directory\ [`']%f'
+set errorformat+=%-G%.%#
+let g:vimspector_break_on_exception = 0
+let g:vimspector_configurations = {
+\		"launch": {
+\			"adapter": "vscode-cpptools", 
+\			"configuration": {
+\				"request": "launch",
+\				"program": "/home/zero/cxx/script-linux/script",
+\           "cwd":"/home/zero/cxx/script/",
+\           "environment":[],
+\				"MIMode": "gdb",
+\				"setupCommands":[
+\						{"text":"-enable-pretty-printing","ignoreFailures":"false"},
+\                  {"text":"set disassembly-flavor intel","ignoreFailures":"false"}
+\				]
+\         }
+\         }
+\	}
+let g:vimspector_terminal_maxwidth = 80
+let g:vimspector_code_minwidth = 100
+nnoremap <silent> <leader>vc : call vimspector#Continue()<cr>
+nnoremap <silent> <leader>vl : call vimspector#Launch()<cr>
+nnoremap <silent> <leader>vr : call vimspector#Reset()<cr>
+nnoremap <silent> <c-s> : call vimspector#StepSOver()<cr>
+nnoremap <silent> <leader>si : call vimspector#StepSInto()<cr>
+nnoremap <silent> <leader>sd : call vimspector#ShowDisassambly()<cr>
+nnoremap <silent> <leader>b : call vimspector#ToggleBreakpoint()<cr>
+nnoremap <silent> <leader>vi <Plug>VimspectorBalloonEval<cr>
+nnoremap <silent> <leader>u : call vimspector#UpFrame()<cr>
+nnoremap <silent> <leader>d : call vimspector#DownFrame()<cr>
+nnoremap <silent> <leader>lb : call vimspector#ListBreakpoints()<cr>
+nnoremap <silent> <leader>rc : call vimspector#RunToCursor()<cr>
+nnoremap <silent> <leader>ls : so Session.vim<cr>
+nnoremap <silent>,cb : make!<cr>
+nnoremap <silent>,cd : !exec $clear<cr>
+nnoremap <silent>,cg : !exec $generate<cr>
+nnoremap <silent>,cr : !exec /home/zero/cxx/script-linux/script<cr>

@@ -1,0 +1,53 @@
+source ~/.vimrc
+let $generate='cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/clang-15 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-15 -S /home/zero/cxx/utils -B /home/zero/cxx/utils-linux'
+let $clear="rm -r /home/zero/cxx/utils-linux"
+set makeprg=cmake\ --build\ /home/zero/cxx/utils-linux\ -j16
+set errorformat=%E%f:%l:%c:\ %trror:\ %m,%-C,%-Z%p^
+set errorformat+=%D%*\\a:\ Entering\ directory\ [`']%f'
+set errorformat+=%X%*\\a:\ Leaving\ directory\ [`']%f'
+set errorformat+=%-G%.%#
+let g:vimspector_break_on_exception = 0
+let g:vimspector_configurations = {
+\		"attach": {
+\			"adapter": "vscode-cpptools", 
+\			"variables": {
+\				"pid": {
+\					"shell": [
+\						"/bin/bash",
+\						"-c",
+\						"pgrep utils | sort | tail -1"
+\					]
+\				}
+\			},
+\			"configuration": {
+\				"request": "attach",
+\				"program": "/home/zero/cxx/utils-linux/utils",
+\           "cwd":"/home/zero/cxx/utils-linux/",
+\           "environment":[],
+\           "processId":"${pid}",
+\				"MIMode": "gdb",
+\				"setupCommands":[
+\						{"text":"-enable-pretty-printing","ignoreFailures":"false"},
+\                  {"text":"set disassembly-flavor intel","ignoreFailures":"false"}
+\				]
+\         }
+\         }
+\	}
+let g:vimspector_terminal_maxwidth = 0
+let g:vimspector_code_minwidth = 100
+nnoremap <silent> <leader>vc : call vimspector#Continue()<cr>
+nnoremap <silent> <leader>vl : call vimspector#Launch()<cr>
+nnoremap <silent> <leader>vr : call vimspector#Reset()<cr>
+nnoremap <silent> <c-s> : call vimspector#StepSOver()<cr>
+nnoremap <silent> <leader>si : call vimspector#StepSInto()<cr>
+nnoremap <silent> <leader>sd : call vimspector#ShowDisassambly()<cr>
+nnoremap <silent> <leader>b : call vimspector#ToggleBreakpoint()<cr>
+nnoremap <silent> <leader>vi <Plug>VimspectorBalloonEval<cr>
+nnoremap <silent> <leader>u : call vimspector#UpFrame()<cr>
+nnoremap <silent> <leader>d : call vimspector#DownFrame()<cr>
+nnoremap <silent> <leader>lb : call vimspector#ListBreakpoints()<cr>
+nnoremap <silent> <leader>rc : call vimspector#RunToCursor()<cr>
+nnoremap <silent> <leader>ls : so Session.vim<cr>
+nnoremap <silent>,cb : make!<cr>
+nnoremap <silent>,cd : !exec $clear<cr>
+nnoremap <silent>,cg : !exec $generate<cr>
