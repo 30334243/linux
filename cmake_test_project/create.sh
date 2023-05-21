@@ -16,12 +16,18 @@ int main(int argc, char **argv) {
 touch CMakeLists.txt
 echo "cmake_minimum_required(VERSION 3.22)
 project($name_project)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SRC
-main.cpp
-$name_project.hpp)
+   main.cpp
+   $name_project.hpp
+   )
 add_subdirectory(./googletest gtest)
 add_executable(\${PROJECT_NAME} \${SRC})
-target_link_libraries(\${PROJECT_NAME} PRIVATE gtest_main)" > CMakeLists.txt
+target_link_libraries(\${PROJECT_NAME} PRIVATE gtest_main)
+add_custom_command(TARGET \${PROJECT_NAME} POST_BUILD
+   COMMAND \${CMAKE_COMMAND} -E copy \${CMAKE_BINARY_DIR}/compile_commands.json \${CMAKE_SOURCE_DIR}/compile_commands.json
+   )
+" > CMakeLists.txt
 # VIMRC
 touch .vimrc
 echo 'source ~/.vimrc
