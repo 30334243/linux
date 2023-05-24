@@ -1,7 +1,7 @@
 cd $1
 echo -n "Enter path install: "
 read path
-if test -n $path
+if test -z $path
 then
    path=$PWD
 fi
