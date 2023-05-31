@@ -76,6 +76,8 @@ set foldmethod=syntax
 set cursorline
 set autoindent
 set nowrap
+set undofile
+set undodir=~/.vim/undodir
 " set keymap=russian-jcukenwin
 " set statusline=%<%f%h%m%r%=format=%{&fileformat}\ file=%{&fileencoding}\ enc=%{&encoding}\ %b\ 0x%B\ %l,%c%V\ %P
 colorscheme desert
