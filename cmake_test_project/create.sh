@@ -49,6 +49,7 @@ then
       echo "let \$generate=\"cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/gcc-$version_compiler -DCMAKE_CXX_COMPILER=/usr/bin/g++-$version_compiler -S $path_project -B $path_project-linux\"
       " >> .vimrc
    fi
+   echo "let \$install=\"cmake --build $path_project-linux --target install --config Debug\""
    echo "let \$clear=\"rm -r $path_project-linux\"
    set makeprg=cmake\ --build\ $path_project-linux\ -j4
    set errorformat=\%E\%f\:\%l\:\%c\:\ \%trror:\ \%m,\%-C,\%-Z\%p\^
@@ -134,5 +135,6 @@ echo "nnoremap <silent> <leader>ls : so Session.vim<cr>
 nnoremap <silent>,cb : make!<cr>
 nnoremap <silent>,cd : !exec \$clear<cr>
 nnoremap <silent>,cg : !exec \$generate<cr>
+nnoremap <silent>,ci : !exec \$install<cr>
 nnoremap <silent>,cr : !exec $path_project-linux/$name_project<cr>
 " >> .vimrc
