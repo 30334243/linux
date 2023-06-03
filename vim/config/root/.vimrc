@@ -16,6 +16,7 @@ call plug#begin()
    Plug 'glts/vim-radical'
    Plug 'glts/vim-magnum'
 	Plug 'vim-airline/vim-airline'
+   Plug 'vifm/vifm.vim'
    " THEMES
    Plug 'morhetz/gruvbox'
 call plug#end()
