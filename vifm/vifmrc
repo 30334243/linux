@@ -182,7 +182,7 @@ filextype {*.pdf},<application/pdf> zathura %c %i, apvlv %c, xpdf %c
 fileviewer {*.pdf},<application/pdf> pdftotext -nopgbrk %c -
 
 " SIGVIEW
-filetype *.sig wine /home/zero/sig_view_4/SIGView.exe %f
+filetype *.sig wine /home/zero/sig_view_4/SIGView.exe %f &
 
 " PostScript
 filextype {*.ps,*.eps,*.ps.gz},<application/postscript>
