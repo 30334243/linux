@@ -86,6 +86,7 @@ then
          \			\"configuration\": {
          \				\"request\": \"launch\",
          \				\"program\": \"$path_project-linux/$name_project\",
+         \           \"args\":[],
          \           \"cwd\":\"$path_project-linux\",
          \           \"environment\":[],
          \				\"MIMode\": \"gdb\",
@@ -114,6 +115,7 @@ then
          \			\"configuration\": {
          \				\"request\": \"attach\",
          \				\"program\": \"$path_project-linux/$name_project\",
+         \           \"args\":[],
          \           \"cwd\":\"$path_project\",
          \           \"environment\":[],
          \           \"processId\":\"\${pid}\",
