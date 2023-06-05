@@ -1,4 +1,4 @@
-sudo apt install gcc g++ make libncurses-dev
+sudo apt install gcc g++ make libncurses-dev make
 cd ~
 git clone https://github.com/vifm/vifm.git
 cd vifm
