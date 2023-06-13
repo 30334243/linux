@@ -373,7 +373,7 @@ while true;do
    read cur_num
    case "${cur_num}" in
       1)
-         ehco "gtest"
+         gtest
          ;;
       2)
          vimrc
