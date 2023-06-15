@@ -110,6 +110,8 @@ ProjectPath=
 ProjectName=
 ConfigFile=
 Gtest=
+BenchMark=
+Kaitai=
 # PROJECT PATH
 FunctionProjectPath() {
    if [[ -z "${ProjectPath}" ]];then
@@ -134,13 +136,25 @@ FunctionProjectName() {
       done
    fi
 }
+# FUNCTION CMAKE BUILD
+function_cmake_build() {
+	mkdir build
+	cd build
+	cmake ..
+	cmake --build .
+	cd ..
+	cd ..
+}
 # FUNCTION GTEST
-gtest() {
+function_gtest() {
    FunctionProjectPath
    FunctionProjectName
    cd "${ProjectPath}"
-   git clone https://github.com/google/googletest.git
-   touch ${ProjectName}.hpp
+	if [[ ! -d "googletest" ]];then
+		git clone https://github.com/google/googletest.git
+	fi
+	cd googletest
+	function_cmake_build
    touch main.cpp
    echo '
 #include "googletest/googletest/include/gtest/gtest.h"
@@ -150,16 +164,171 @@ int main(int argc, char **argv) {
 }'>"${ProjectPath}/main.cpp"
    Gtest="true"
 }
-# FUNCTION VIMRC
-vimrc() {
+# OVERWRITTEN MAIN.CPP
+overwritten_main() {
+		touch main.cpp
+		echo '
+#include "benchmark/benchmark.h"
+'>"${ProjectPath}/main.cpp"
+if [[ "${Gtest}" == "true" ]];then
+	echo '
+#include "gtest/gtest.h"
+	'>>"${ProjectPath}/main.cpp"
+fi
+echo '
+static void BM_StringCreation(benchmark::State& state) {
+for (auto _ : state)
+	std::string empty_string;
+}
+// Register the function as a benchmark
+BENCHMARK(BM_StringCreation);
+
+// Define another benchmark
+static void BM_StringCopy(benchmark::State& state) {
+std::string x = "hello";
+for (auto _ : state)
+	std::string copy(x);
+}
+BENCHMARK(BM_StringCopy);
+		'>>"${ProjectPath}/main.cpp"
+		if [[ "${Gtest}" == "true" ]];then
+			echo '
+int main(int argc, char **argv) {
+	::benchmark::RunSpecifiedBenchmarks();
+	::testing::InitGoogleTest(&argc, argv); 
+	return RUN_ALL_TESTS();
+}
+		'>>"${ProjectPath}/main.cpp"
+	else
+		echo '
+BENCHMARK_MAIN();
+		'>>"${ProjectPath}/main.cpp"
+		fi
+}
+# OVERWRITTEN KAITAI MAIN.CPP
+overwritten_main_kaitai() {
+		touch main.cpp
+		echo '
+#include "kaitai-io/kaitaistream.h"
+'>"${ProjectPath}/main.cpp"
+if [[ "${Gtest}" == "true" ]];then
+	echo '
+#include "gtest/gtest.h"
+	'>>"${ProjectPath}/main.cpp"
+fi
+if [[ "${BenchMark}" == "true" ]];then
+	echo '
+#include "benchmark/benchmark.h"
+
+static void BM_StringCreation(benchmark::State& state) {
+for (auto _ : state)
+	std::string empty_string;
+}
+// Register the function as a benchmark
+BENCHMARK(BM_StringCreation);
+
+// Define another benchmark
+static void BM_StringCopy(benchmark::State& state) {
+std::string x = "hello";
+std::ifstream is("/home/zero/Documents/dns.sig", std::ifstream::binary);
+kaitai::kstream ks(&is);
+dns_packet_t data(&ks);
+for (auto _ : state)
+	std::string copy(x);
+}
+BENCHMARK(BM_StringCopy);
+		'>>"${ProjectPath}/main.cpp"
+		if [[ "${Gtest}" == "true" ]];then
+			echo '
+int main(int argc, char **argv) {
+	::benchmark::RunSpecifiedBenchmarks();
+	::testing::InitGoogleTest(&argc, argv); 
+	return RUN_ALL_TESTS();
+}
+		'>>"${ProjectPath}/main.cpp"
+	else
+		echo '
+BENCHMARK_MAIN();
+		'>>"${ProjectPath}/main.cpp"
+		fi
+	else
+		echo '
+int main() {
+ 	std::ifstream is("/home/zero/Documents/dns.sig", std::ifstream::binary);
+ 	kaitai::kstream ks(&is);
+ 	dns_packet_t data(&ks);
+	return 0;
+}
+'>>"${ProjectPath}/main.cpp"
+fi
+}
+# FUNCTION BENCHMARK
+function_benchmark() {
    FunctionProjectPath
    FunctionProjectName
-   echo -ne "${cyan}Enter the name of the configuration file (by default \".vimrc\"):${white}\n"
-   read config_file
-   # CONFIG FILE
-   if [[ -z "${config_file}" ]];then
-      ConfigFile=".vimrc"
-      if [[ ! -f ".vimrc" ]];then
+   cd "${ProjectPath}"
+	if [[ ! -d "benchmark" ]];then
+		git clone https://github.com/google/benchmark.git
+	fi
+	cd benchmark
+	cmake -E make_directory "build"
+	cmake -E chdir "build" cmake -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../
+	cmake --build "build" --config Release
+	cd ..
+	if [[ -f "main.cpp" ]];then
+		echo -en "The file will be overwritten. Do you agree (yes/no)?"
+		read answer
+		if [[ "${answer}" == "yes" || "${answer}" == "y" ]];then
+			overwritten_main
+			BenchMark="true"
+		elif [[ "${answer}" == "no" || "${answer}" == "n" ]];then
+			echo ""
+		else
+			echo -e "${yellow}Unknown command.${white}"
+		fi
+	else
+		overwritten_main
+		BenchMark="true"
+	fi
+}
+# FUNCTION KAITAI
+function_kaitai() {
+	FunctionProjectPath
+	FunctionProjectName
+   cd "${ProjectPath}"
+	if [[ ! -d "kaitai_struct_cpp_stl_runtime" ]];then
+		git clone https://github.com/kaitai-io/kaitai_struct_cpp_stl_runtime.git
+	fi
+	cd kaitai_struct_cpp_stl_runtime
+	sed '3 s/^/#/' CMakeLists.txt > CMakeLists.txt
+	sed '$ s/^/#/' CMakeLists.txt > CMakeLists.txt
+	function_cmake_build
+	if [[ -f "main.cpp" ]];then
+		echo -en "The file will be overwritten. Do you agree (yes/no)?"
+		read answer
+		if [[ "${answer}" == "yes" || "${answer}" == "y" ]];then
+			overwritten_main_kaitai
+			Kaitai="true"
+		elif [[ "${answer}" == "no" || "${answer}" == "n" ]];then
+			echo ""
+		else
+			echo -e "${yellow}Unknown command.${white}"
+		fi
+	else
+		overwritten_main_kaitai
+		Kaitai="true"
+	fi
+}
+# FUNCTION VIMRC
+function_vimrc() {
+	FunctionProjectPath
+	FunctionProjectName
+	echo -ne "${cyan}Enter the name of the configuration file (by default \".vimrc\"):${white}\n"
+	read config_file
+	# CONFIG FILE
+	if [[ -z "${config_file}" ]];then
+		ConfigFile=".vimrc"
+		if [[ ! -f ".vimrc" ]];then
          touch ".vimrc"
       fi
    else
@@ -242,8 +411,12 @@ vimrc() {
       fi
    done
    echo 'source ~/.vimrc' > "${ProjectPath}/${ConfigFile}"
+	benchmark_enable_gtest_tests=
+	if [[ "${BenchMark}" == "true" ]];then
+		benchmark_enable_gtest_tests="-DBENCHMARK_ENABLE_GTEST_TESTS=OFF"
+	fi
    echo "
-   let \$generate=\"cmake -DCMAKE_BUILD_TYPE=${selected_type_build} -DCMAKE_C_COMPILER=${Compilers[${selected_compiler}-1]} -DCMAKE_CXX_COMPILER=${Compilerspp[${selected_compiler}-1]} -S ${ProjectPath} -B ${ProjectPath}/${ProjectName}-linux\"
+   let \$generate=\"cmake ${benchmark_enable_gtest_tests} -DCMAKE_BUILD_TYPE=${selected_type_build} -DCMAKE_C_COMPILER=${Compilers[${selected_compiler}-1]} -DCMAKE_CXX_COMPILER=${Compilerspp[${selected_compiler}-1]} -S ${ProjectPath} -B ${ProjectPath}/${ProjectName}-linux\"
    let \$clear=\"rm -r ${ProjectPath}/${ProjectName}-linux\"
    let \$install=\"cmake --build ${ProjectPath}/${ProjectName}-linux/ --target install --config ${selected_type_build}\"
    set makeprg=cmake\ --build\ ${ProjectPath}/${ProjectName}-linux\ -j${selected_cores}
@@ -322,7 +495,7 @@ vimrc() {
    fi
 }
 # FUNCTION CMAKE
-cmake() {
+function_cmake() {
    FunctionProjectPath
    FunctionProjectName
    touch "${ProjectPath}/CMakeLists.txt"
@@ -330,32 +503,68 @@ cmake() {
       echo -ne "Download GTEST? (yes/no)"
       read isgtest
       if [[ "${isgtest}" == "y" || "${isgtest}" == "yes" ]];then
-         gtest
+         function_gtest
+		elif [[ "${isgtest}" == "n" || "${isgtest}" == "no" ]];then
+			echo ""
+		else
+			echo "${yellow}Unknown command.${white}"
       fi
    fi
+	if [[ -z "${BenchMark}" ]];then
+      echo -ne "Download BENCHMARK? (yes/no)"
+      read isbench
+      if [[ "${isbench}" == "y" || "${isbench}" == "yes" ]];then
+         function_benchmark
+		elif [[ "${isbench}" == "n" || "${isbench}" == "no" ]];then
+			echo ""
+		else
+			echo "${yellow}Unknown command.${white}"
+      fi
+	fi
    echo "
 cmake_minimum_required(VERSION 3.22)
 project(${ProjectName})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
    set(SRC
    main.cpp
-   ${ProjectName}.hpp
 )">"${ProjectPath}/CMakeLists.txt"
 
 if [[ "${Gtest}" == "true"  ]];then
    echo "
-   add_subdirectory(./googletest gtest)
+   add_subdirectory(googletest)
+   ">>"${ProjectPath}/CMakeLists.txt"
+fi
+if [[ "${BenchMark}" == "true"  ]];then
+   echo "
+   add_subdirectory(benchmark)
+   ">>"${ProjectPath}/CMakeLists.txt"
+fi
+if [[ "${Kaitai}" == "true"  ]];then
+   echo "
+   add_subdirectory(kaitai_struct_cpp_stl_runtime)
    ">>"${ProjectPath}/CMakeLists.txt"
 fi
 echo "
 add_executable(\${PROJECT_NAME} \${SRC})">>"${ProjectPath}/CMakeLists.txt"
 if [[ "${Gtest}" == "true" ]];then
    echo "
-   target_link_libraries(\${PROJECT_NAME} PRIVATE gtest_main)
+target_link_libraries(\${PROJECT_NAME} PRIVATE gtest_main)
+target_include_directories(\${PROJECT_NAME} PUBLIC
+	"\${PROJECT_SOURCE_DIR}/googletest/googletest/include")
    ">>"${ProjectPath}/CMakeLists.txt"
-else
+fi
+if [[ "${BenchMark}" == "true" ]];then
    echo "
-   target_link_libraries(\${PROJECT_NAME})
+target_link_libraries(\${PROJECT_NAME} PRIVATE benchmark::benchmark)
+target_include_directories(\${PROJECT_NAME} PUBLIC
+	"\${PROJECT_SOURCE_DIR}/benchmark/include")
+   ">>"${ProjectPath}/CMakeLists.txt"
+fi
+if [[ "${Kaitai}" == "true" ]];then
+   echo "
+target_link_libraries(\${PROJECT_NAME} PRIVATE kaitai_struct_cpp_stl_runtime)
+target_include_directories(\${PROJECT_NAME} PUBLIC
+	"\${PROJECT_SOURCE_DIR}/kaitai_struct_cpp_stl_runtime")
    ">>"${ProjectPath}/CMakeLists.txt"
 fi
 echo "
@@ -368,18 +577,26 @@ add_custom_command(TARGET \${PROJECT_NAME} POST_BUILD
 # MAIN LOOP
 while true;do
    echo -ne "${cyan}1. Download GTEST:${white}\n"
-   echo -ne "${cyan}2. Creating a configuration file \".vimrc\":${white}\n"
-   echo -ne "${cyan}3. To create a file \"CMakeLists.txt\":${white}\n"
+   echo -ne "${cyan}2. Download BENCHMARK:${white}\n"
+   echo -ne "${cyan}3. Download KAITAI:${white}\n"
+   echo -ne "${cyan}4. Creating a configuration file \".vimrc\":${white}\n"
+   echo -ne "${cyan}5. To create a file \"CMakeLists.txt\":${white}\n"
    read cur_num
    case "${cur_num}" in
       1)
-         gtest
+         function_gtest
          ;;
-      2)
-         vimrc
+		2)
+			function_benchmark
+			;;
+		3)
+			function_kaitai
+			;;
+      4)
+         function_vimrc
          ;;
-      3)
-         cmake
+      5)
+         function_cmake
          ;;
    esac
 done
