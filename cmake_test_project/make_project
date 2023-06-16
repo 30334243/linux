@@ -209,7 +209,7 @@ BENCHMARK_MAIN();
 overwritten_main_kaitai() {
 		touch main.cpp
 		echo '
-#include "kaitai-io/kaitaistream.h"
+#include "kaitai/kaitaistream.h"
 '>"${ProjectPath}/main.cpp"
 if [[ "${Gtest}" == "true" ]];then
 	echo '
@@ -300,8 +300,7 @@ function_kaitai() {
 		git clone https://github.com/kaitai-io/kaitai_struct_cpp_stl_runtime.git
 	fi
 	cd kaitai_struct_cpp_stl_runtime
-	sed '3 s/^/#/' CMakeLists.txt > CMakeLists.txt
-	sed '$ s/^/#/' CMakeLists.txt > CMakeLists.txt
+	sed -i -e '3 s/^/#/' -e '$ s/^/#/' "${ProjectPath}"/kaitai_struct_cpp_stl_runtime/CMakeLists.txt
 	function_cmake_build
 	if [[ -f "main.cpp" ]];then
 		echo -en "The file will be overwritten. Do you agree (yes/no)?"
@@ -525,10 +524,10 @@ function_cmake() {
 cmake_minimum_required(VERSION 3.22)
 project(${ProjectName})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-   set(SRC
+set(SRC
    main.cpp
 )">"${ProjectPath}/CMakeLists.txt"
-
+set -x
 if [[ "${Gtest}" == "true"  ]];then
    echo "
    add_subdirectory(googletest)
@@ -572,6 +571,7 @@ add_custom_command(TARGET \${PROJECT_NAME} POST_BUILD
    COMMAND \${CMAKE_COMMAND} -E copy \${CMAKE_BINARY_DIR}/compile_commands.json \${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 ">>"${ProjectPath}/CMakeLists.txt"
+set +x
 }
 # CONSTANTS
 # MAIN LOOP
