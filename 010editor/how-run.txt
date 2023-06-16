@@ -1,0 +1,1 @@
+QT_QPA_PLATFORM=xcb ~/010editor/010editor Record.sig 
