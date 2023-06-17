@@ -11,6 +11,7 @@ GetGccVersion() {
    for i in $(exec sudo find /usr/bin/ -name "gcc*"|grep -E "gcc-[0-9]{1,}"|sort -t"-" -nk2);do
       Gcc+=("${i}")
    done
+   Gcc+=$(exec sudo find /usr/bin/ -name "gcc");
    if (( "${#Gcc[@]}" == 0 ));then
       echo -e "${yellow}GCC compiler not found${white}"
    fi
@@ -22,18 +23,25 @@ GetGppVersion() {
    for i in $(exec sudo find /usr/bin/ -name "g\+\+*"|grep -E "g\+\+-[0-9]{1,}"|sort -t"-" -nk2);do
       Gpp+=("${i}")
    done
+   if [[ "${#Gpp[@]}" == 0 ]];then
+      j=0
+      for i in "${Gpp[@]}";do
+         tmp_gcc=`echo "${Gcc[${j}]}"|awk -F- '{print $NF}'`
+         tmp_gpp=`echo "${i}"|awk -F- '{print $NF}'`
+         j=$((++j))
+         if [[ "${tmp_gcc}" != "${tmp_gpp}" ]];then
+            echo -e "${red}The GCC compiler version is not the same as the G++ compiler version${white}"
+         fi
+      done
+   fi 
+   Gpp+=$(exec sudo find /usr/bin/ -name "g\+\+")
    if (( "${#Gpp[@]}" == 0 ));then
       echo -e "${yellow}g++ compiler not found${white}"
-   fi
-   j=0
-   for i in "${Gpp[@]}";do
-      tmp_gcc=`echo "${Gcc[${j}]}"|awk -F- '{print $NF}'`
-      tmp_gpp=`echo "${i}"|awk -F- '{print $NF}'`
-      j=$((++j))
-      if [[ "${tmp_gcc}" != "${tmp_gpp}" ]];then
+   else
+      if [[ "${#Gcc[@]}" != "${#Gpp[@]}" ]];then
          echo -e "${red}The GCC compiler version is not the same as the G++ compiler version${white}"
       fi
-   done
+   fi
 }
 GetGppVersion
 # GET CLANG VERSION
