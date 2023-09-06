@@ -1,39 +1,49 @@
 "PLUGINS
 call plug#begin()
-   Plug 'Valloric/YouCompleteMe'
+   " Plug 'Valloric/YouCompleteMe'
    Plug 'bfrg/vim-cpp-modern'
    Plug 'tpope/vim-commentary'
-   Plug 'tpope/vim-surround'
+   " Plug 'tpope/vim-surround'
    Plug 'tpope/vim-unimpaired'
-   Plug 'tpope/vim-repeat'
+   " Plug 'tpope/vim-repeat'
    Plug 'fedorenchik/qt-support.vim'
    Plug 'rhysd/clever-f.vim'
-   Plug 'Yggdroot/indentLine'
+   " Plug 'Yggdroot/indentLine'
    Plug 'richq/vim-cmake-completion'
-   Plug 'tpope/vim-rails'
+   " Plug 'tpope/vim-rails'
    Plug 'puremourning/vimspector'
-   Plug 'fedorenchik/VimCalc3'
-   Plug 'glts/vim-radical'
-   Plug 'glts/vim-magnum'
+   " Plug 'fedorenchik/VimCalc3'
+   " Plug 'glts/vim-radical'
+   " Plug 'glts/vim-magnum'
 	Plug 'vim-airline/vim-airline'
    Plug 'vifm/vifm.vim'
+   " PYTHON
+   Plug 'davidhalter/jedi-vim'
+   " Plug 'python-mode/python-mode'
+   " Plug 'rosenfeld/conque-term'
+   " MARKDOWN
+   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+   " Plug 'shime/vim-livedown'
    " THEMES
-   Plug 'morhetz/gruvbox'
+   " Plug 'morhetz/gruvbox'
 call plug#end()
+"LIVEDOWN
+" map ,md : LivedownToggle<cr>
+"MARKDOWN-PREVIEW
+nmap ,md <Plug>MarkdownPreviewToggle
 "VIM-AIRLINE
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'jsformatter'
 "INDENTLINE
-let g:indentLine_concealcursor = 'inc'
-let g:indentLine_conceallevel = 2
+" let g:indentLine_concealcursor = 'inc'
+" let g:indentLine_conceallevel = 2
 "YOUCOMPLETEME
-let g:ycm_enable_inlay_hints=0
-let g:ycm_clear_inlay_hints_in_insert_mode=1
-let g:ycm_seed_identifiers_with_syntax=1
-let g:ycm_confirm_extra_conf=0
-let g:ycm_collect_identifiers_from_tag_files = 1
-let g:ycm_clangd_args=['--header-insertion=never']
-set completeopt=longest,menu
+" let g:ycm_enable_inlay_hints=0
+" let g:ycm_clear_inlay_hints_in_insert_mode=1
+" let g:ycm_seed_identifiers_with_syntax=1
+" let g:ycm_confirm_extra_conf=0
+" let g:ycm_collect_identifiers_from_tag_files = 1
+" let g:ycm_clangd_args=['--header-insertion=never']
 "VIM-CPP-MODERN
 let g:cpp_simple_highlight = 1
 let g:cpp_member_highlight = 1
@@ -51,8 +61,13 @@ set errorformat+=%-G%.%#
 "SETTINGS
 autocmd FileType cpp,hpp,h setlocal cindent cino=j1,(0,ws,Ws
 autocmd FileType cpp,hpp,h,json setlocal foldlevel=9999
+autocmd FileType markdown setlocal spell spelllang=ru,en
+" let g:vim_markdown_conceal = 0
+" let g:vim_markdown_conceal_code_blocks = 0
+let g:indentLine_setConceal = 0
 syntax on
 filetype plugin indent on
+set completeopt=longest,menu
 set sessionoptions-=options
 set nocp
 set noswapfile
@@ -79,19 +94,22 @@ set autoindent
 set nowrap
 set undofile
 set undodir=~/.vim/undodir
-" set keymap=russian-jcukenwin
-" set statusline=%<%f%h%m%r%=format=%{&fileformat}\ file=%{&fileencoding}\ enc=%{&encoding}\ %b\ 0x%B\ %l,%c%V\ %P
+set keymap=russian-jcukenwin
+set imsearch=0
+set iminsert=0
+set statusline=%<%f%h%m%r%=format=%{&fileformat}\ file=%{&fileencoding}\ enc=%{&encoding}\ %b\ 0x%B\ %l,%c%V\ %P
 colorscheme desert
 "HOTKEY
    let mapleader = " "
 	"VIMGREP
-	noremap <silent> <leader>f :vimgrep /<C-r>//g **<cr> \| !:copen<cr>
-	noremap <silent> <leader>todo :vimgrep /todo/g **<cr> \| !:copen<cr>
+	" noremap <silent> <leader>f :vimgrep /<C-r>//g **<cr> \| !:copen<cr>
+	" noremap <silent> <leader>todo :vimgrep /todo/g **<cr> \| !:copen<cr>
    "YOUCOMPLETEME
-      nnoremap <silent> <leader>h <Plug>(YCMToggleInlayHints)
-      noremap <leader>g :YcmCompleter GoTo<cr>
-      noremap <leader>r :YcmCompleter GoToReferences<cr>
-      noremap <leader>i <plug>(YCMHover)
+      " nnoremap <silent> <leader>h <Plug>(YCMToggleInlayHints)
+      " noremap <leader>g :YcmCompleter GoTo<cr>
+      " noremap <leader>r :YcmCompleter GoToReferences<cr>
+      " noremap <leader>i <plug>(YCMHover)
+      " let g:ycm_python_binary_path='/usr/bin/python'
    "QUICKFIX
 		"FUNCTIONS
 		function! ToggleQuickFix()
@@ -103,8 +121,8 @@ colorscheme desert
 		endfunction
 		"HOTKEYS
       noremap <leader>o :call ToggleQuickFix()<cr>
-      noremap <leader>n :cnext<cr>
-      noremap <leader>p :cprev<cr>
+      " noremap <leader>n :cnext<cr>
+      " noremap <leader>p :cprev<cr>
    "USER
       "EXPLORER
          noremap <silent> <leader>e :Explore<cr>
@@ -120,10 +138,10 @@ colorscheme desert
             noremap <up> <c-w>k
             noremap <right> <c-w>l
          "CREATE
-            noremap ,H :topleft  vnew<cr>
-            noremap ,J :botright new<cr>
-            noremap ,K :topleft  new<cr>
-            noremap ,L :botright vnew<cr>
+            " noremap ,H :topleft  vnew<cr>
+            " noremap ,J :botright new<cr>
+            " noremap ,K :topleft  new<cr>
+            " noremap ,L :botright vnew<cr>
          "SIZE
             noremap <c-h>    <C-w><
             noremap <c-j>    <C-w>-
@@ -136,12 +154,12 @@ colorscheme desert
             noremap ,k :leftabove   new<cr>
             noremap ,l :rightbelow  vnew<cr>
          "MOVEMENT
-            noremap gb :bn<cr>
-            noremap gn :bp<cr>
+            " noremap gb :bn<cr>
+            " noremap gn :bp<cr>
          "CLOSE
             noremap <leader>c :q<cr>
       "REDROW
-         noremap ,rr :redraw!<cr>
+         " noremap ,rr :redraw!<cr>
       "TAB
          noremap ,,h :tabn 1<cr>
          noremap ,,j :tabn 2<cr>

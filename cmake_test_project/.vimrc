@@ -1,4 +1,5 @@
 source ~/.vimrc
+<<<<<<< HEAD
 
    let g:vimspector_break_on_exception = 0
    let g:vimspector_terminal_maxwidth = 30
@@ -31,3 +32,7 @@ source ~/.vimrc
       \         }
       \	}
 		\}
+=======
+let $generate="cmake -DCMAKE_BUILD_TYPE=Release-DCMAKE_C_COMPILER=/usr/bin/clang-12 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-12 -S /home/zero/cxx/grid/-B /home/zero/cxx/grid-linux/
+let $clear="rm -r /home/zero/cxx/grid-linux/"
+>>>>>>> e1da866 (1. Изменил .vimrc (попробовать))
