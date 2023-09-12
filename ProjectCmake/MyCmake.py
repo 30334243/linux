@@ -34,7 +34,7 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
           "benchmark=/home/zero/cxx/include/benchmark"+Color.END)
     # args = sys.argv
     if args.__len__() <= 1:
-        print(RED+"Не достаточно аргументов"+END)
+        print(Color.RED+"Не достаточно аргументов"+Color.END)
         exit()
     cmake = open("CMakeLists.txt","w+")
     name_project = args[0]
@@ -42,6 +42,7 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
     gprof = False
     googletest = False
     path_googletest = "."
+    path_benchmark = "."
     benchmark = False
     cmake_version = ""
     print(Color.GREEN+"Current version CMake: "+CMake.GetVersion()+Color.END+"\n")
@@ -56,6 +57,7 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
             path_googletest = arg.removeprefix("googletest=")
             googletest = True
         if arg == "benchmark":
+            path_benchmark = arg.removeprefix("googletest=")
             benchmark = True
         if arg.startswith("cmake-version="):
             cmake_version = arg.removeprefix("cmake-version=")
@@ -94,7 +96,7 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
                 Main.Googletest()
     if benchmark:
         cmake.write('#benchmark\n')
-        cmake.write('add_subdirectory(benchmark)\n')
+        cmake.write(f'add_subdirectory({path_benchmark}benchmark)\n')
         cmake.write('#end benchmark\n')
         if os.path.exists("benchmark") == False:
             Git.Benchmark()

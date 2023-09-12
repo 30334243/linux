@@ -16,7 +16,7 @@ print(Color.PURPLE+"  1. python "+Color.GREEN +"MyCreateProject.py "+
       Color.YELLOW+"Project"+Color.END)
 args = sys.argv
 if args.__len__() <= 1:
-    print(RED+"Не достаточно аргументов"+END)
+    print(Color.RED+"Не достаточно аргументов"+Color.END)
     exit()
 project_name = args[1]
 project_path = ""
