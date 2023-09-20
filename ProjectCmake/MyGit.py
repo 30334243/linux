@@ -18,3 +18,43 @@ def CmakeBuild(url):
     subprocess.call(["cmake","--build","."])
     os.chdir("..")
     os.chdir("..")
+def SFML(env):
+    os.chdir(env)
+    if os.path.exists("SFML"):pass
+    else:
+        os.mkdir("SFML")
+    # subprocess.call(["export",'SFML_INSTALL_DIR=${PWD}/SFML'])
+    os.system("export SFML_INSTALL_DIR=${PWD}/SFML")
+    return
+    if os.path.exists("tmp"): pass
+    else:
+        os.mkdir("tmp")
+    os.chdir("tmp")
+    subprocess.call(["git","clone","https://github.com/SFML/SFML.git"])
+    os.chdir("SFML")
+    # debug
+    if os.path.exists("build_debug"):pass
+    else:
+        os.mkdir("build_debug")
+    os.chdir("build_debug")
+    subprocess.call(["cmake",
+                     "-G","Unix Makefiles",
+                     "-DCMAKE_BUILD_TYPE=Debug",
+                     "-DCMAKE_INSTALL_PREFIX:PATH=\"${SFML_INSTALL_DIR}\"",
+                     ".."
+                     ])
+    subprocess.call(["cmake","--build","."])
+    subprocess.call(["cmake","--build",".","--target","install"])
+    # release
+    if os.path.exists("build_release"):pass
+    else :
+        os.mkdir("../build_release")
+    os.chdir("../build_release")
+    subprocess.call(["cmake",
+                     "-G","Unix Makefiles",
+                     "-DCMAKE_BUILD_TYPE=Release",
+                     "-DCMAKE_INSTALL_PREFIX:PATH=\"${SFML_INSTALL_DIR}\"",
+                     ".."
+                     ])
+    subprocess.call(["cmake","--build","."])
+    subprocess.call(["cmake","--build",".","--target","install"])

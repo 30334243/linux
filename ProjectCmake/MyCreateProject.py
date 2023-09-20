@@ -11,11 +11,13 @@ import MyCmake as CMake
 # .  gprof
 # .  googletest
 # .  benchmark
+# .  sfml
+
 print(Color.GREEN+"Example:")
-print(Color.PURPLE+"  1. python "+Color.GREEN +"MyCreateProject.py "+
+print(Color.PURPLE+"\tpython "+Color.GREEN +"MyCreateProject.py "+
       Color.YELLOW+"Project"+Color.END)
 args = sys.argv
-if args.__len__() <= 1:
+if args.__len__() < 1:
     print(Color.RED+"Не достаточно аргументов"+Color.END)
     exit()
 project_name = args[1]
@@ -31,6 +33,8 @@ if project_path == "" and (not os.path.exists(project_name)):
     os.chdir(project_name)
 elif project_path == "" and os.path.exists(project_name):
     os.chdir(project_name)
+    ex=os.path.exists(project_name)
+    i=project_path == ""
 elif project_path != "" and (not os.path.exists(project_path)):
     os.mkdir(project_path)
     os.chdir(project_path)
@@ -41,4 +45,4 @@ elif environment_path != "" and (not os.path.exists(environment_path)):
 else:
     print(Color.RED+"Error!!!"+Color.END)
     exit()
-CMake.CreateCMakeLists(project_path,project_name,environment_path,args[1:])
+CMake.CreateCMakeLists(project_path,project_name,args[1:])

@@ -3,7 +3,6 @@ import sys
 import subprocess
 import MyGit as Git
 import MyWriteMain as Main
-import MyCmake as CMake
 import MyColor as Color
 
 def GetVersion():
@@ -21,7 +20,8 @@ def GetVersion():
 # . gprof
 # . googletest
 # . benchmark
-def CreateCMakeLists(project_path,name_project,environment_path,args):
+# . sfml
+def CreateCMakeLists(project_path,name_project,args):
     print(Color.GREEN+"Example:")
     print(Color.PURPLE+"  1. python "+Color.GREEN +"MyCMakeListCreat.py "+
           Color.YELLOW+"Project 3.22 "+Color.END)
@@ -33,7 +33,7 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
           "googletest=/home/zero/cxx/include/googletest "
           "benchmark=/home/zero/cxx/include/benchmark"+Color.END)
     # args = sys.argv
-    if args.__len__() <= 1:
+    if args.__len__() < 1:
         print(Color.RED+"Не достаточно аргументов"+Color.END)
         exit()
     cmake = open("CMakeLists.txt","w+")
@@ -41,11 +41,13 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
     qt = False
     gprof = False
     googletest = False
+    benchmark = False
+    sfml = False
     path_googletest = "."
     path_benchmark = "."
-    benchmark = False
+    path_sfml = "."
     cmake_version = ""
-    print(Color.GREEN+"Current version CMake: "+CMake.GetVersion()+Color.END+"\n")
+    print(Color.GREEN+"Current version CMake: "+GetVersion()+Color.END+"\n")
     for arg in args[1:]:
         if arg == "qt":
             qt = True
@@ -59,6 +61,8 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
         if arg == "benchmark":
             path_benchmark = arg.removeprefix("googletest=")
             benchmark = True
+        if arg == "sfml":
+            sfml = True
         if arg.startswith("cmake-version="):
             cmake_version = arg.removeprefix("cmake-version=")
     cmake.write(f'cmake_minimum_required(VERSION {cmake_version})\n')
@@ -114,3 +118,11 @@ def CreateCMakeLists(project_path,name_project,environment_path,args):
         cmake.write('target_include_directories(${PROJECT_NAME} PUBLIC\n')
         cmake.write('                           ${PROJECT_SOURCE_DIR}/benchmark/include\n')
         cmake.write('#end benchmark\n')
+    if sfml:
+        cmake.write('#sfml\n')
+        cmake.write('target_link_libraries(${PROJECT_NAME}\n'
+                    '       sfml-graphics'
+                    '       sfml-window'
+                    '       sfml-system'
+                    '       )'
+                    )
